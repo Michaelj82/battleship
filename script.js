@@ -9,6 +9,8 @@ const Ship = (length) => {
         length: length,
         timesHit: 0,
         sunk: false,
+        shipShape: [],
+        board: Gameboard(),
 
     }
 
@@ -23,8 +25,28 @@ const Ship = (length) => {
         isSunk()
     }
 
+    function place(x, y, direction){
+
+        if (direction == 'vertical'){
+            for (let i = 0; i < state.length; i++){
+                state.shipShape.push([y+i,x])
+            }
+        }else if (direction == 'horizontal'){
+            for (let i = 0; i < state.length; i++){
+                state.shipShape.push([y,x+i])
+
+            }
+        }
+
+        state.board.placeShip(state.shipShape)
+        
+
+
+
+    }
+
     return Object.assign(
-        {state, hit}
+        {state, hit, place}
     )
 
 
@@ -46,13 +68,27 @@ const Gameboard = () =>{
         [0,0,0,0,0,0,0],
         [0,0,0,0,0,0,0]
         ],
+        hitCoordinates:[],
+        missedCoordinates:[],
+        valid: true,
 
 
 
     }
 
-    function placeShip(direction){
-        
+    function placeShip(coordinates){
+        for (let i = 0; i < coordinates.length; i++){
+            for (let j = 0; i < coordinates[i].length; j++){
+                if (coordinates[i][j] >= 7){
+                    valid = false;
+                    return false;
+                }
+            }
+        }
+
+        // if (valid == true){
+        //     return('bruh')
+        // }el
     }
 
     // function attackOnBoard(coordinates){
@@ -65,7 +101,7 @@ const Gameboard = () =>{
     // }
 
     return Object.assign(
-        {state, }
+        {state, placeShip}
     )
 
 
