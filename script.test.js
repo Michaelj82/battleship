@@ -30,7 +30,44 @@ test('Making ship with length makes right direction plus right length', () =>{
     expect(horizontalShip.state.shipShape).toMatchObject([[2,2],[2,3],[2,4]])
 })
 
-test('Making a ship and its length go out of bounds returns false', () => {
+test('Making a ship and its length go out of bounds returns Error', () => {
     let ship = myModule.Ship(4);
-    expect(ship.place(5,5, 'vertical')).tobeFalsy();
+
+    let board = myModule.Gameboard();
+
+    expect(board.placeShip(ship, 6, 6, 'vertical')).toMatchObject(Error('Ship overextends map'))
+
+})
+
+test('If you place down a ship it sets the Gameboards coordinate to 1', () =>{
+    let ship = myModule.Ship(2);
+    let board = myModule.Gameboard();
+
+    board.placeShip(ship, 1,1, 'vertical')
+
+    expect(board.state.board).toMatchObject([
+        [0,0,0,0,0,0,0],
+        [0,1,0,0,0,0,0],
+        [0,1,0,0,0,0,0],
+        [0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0]
+    ])
+
+})
+
+
+test('Cant overlap ships', () =>{
+    let ship = myModule.Ship(2);
+    let board = myModule.Gameboard();
+
+    board.placeShip(ship, 1,1, 'vertical')
+
+    let newShip = myModule.Ship(3)
+
+    board.placeShip
+
+    expect(board.placeShip(newShip, 0, 1, 'vertical')).toMatchObject(Error('Overlaps a ship'))
+
 })

@@ -37,8 +37,6 @@ const Ship = (length) => {
 
             }
         }
-
-        state.board.placeShip(state.shipShape)
         
 
 
@@ -70,25 +68,46 @@ const Gameboard = () =>{
         ],
         hitCoordinates:[],
         missedCoordinates:[],
-        valid: true,
 
 
 
     }
 
-    function placeShip(coordinates){
-        for (let i = 0; i < coordinates.length; i++){
-            for (let j = 0; i < coordinates[i].length; j++){
-                if (coordinates[i][j] >= 7){
-                    valid = false;
-                    return false;
+    function placeShip(ship, x, y, direction){
+        ship.place(x,y,direction)
+
+        let valid = true;
+
+        for (let i = 0; i < ship.state.shipShape.length; i++){
+            for (let j = 0; j < ship.state.shipShape[i].length; j++){
+                if (ship.state.shipShape[i][j] >= 7){
+
+                    valid = false
                 }
+
             }
+
         }
 
-        // if (valid == true){
-        //     return('bruh')
-        // }el
+        if (valid == true){
+
+            for (let i = 0; i < ship.state.shipShape.length; i++){
+                let y = ship.state.shipShape[i][0]
+                let x = ship.state.shipShape[i][1]
+
+                if (state.board[y][x] == 1){
+                    return Error('Overlaps a ship')
+                }else{
+                    state.board[y][x] = 1
+                }
+
+            }
+
+
+        }else if (valid == false){
+            return Error('Ship overextends map')
+        }
+
     }
 
     // function attackOnBoard(coordinates){
