@@ -25,7 +25,8 @@ const Ship = (length) => {
         isSunk()
     }
 
-    function place(x, y, direction){
+    function place(y, x, direction){
+        state.shipShape = []
 
         if (direction == 'vertical'){
             for (let i = 0; i < state.length; i++){
@@ -68,13 +69,15 @@ const Gameboard = () =>{
         ],
         hitCoordinates:[],
         missedCoordinates:[],
+        allShips: [],
+        allDead: false,
 
 
 
     }
 
-    function placeShip(ship, x, y, direction){
-        ship.place(x,y,direction)
+    function placeShip(ship, y, x, direction){
+        ship.place(y,x,direction)
 
         let valid = true;
 
@@ -91,36 +94,110 @@ const Gameboard = () =>{
 
         if (valid == true){
 
+            let toPutOnCoordinates = []
+
             for (let i = 0; i < ship.state.shipShape.length; i++){
                 let y = ship.state.shipShape[i][0]
                 let x = ship.state.shipShape[i][1]
 
+
                 if (state.board[y][x] == 1){
+                    ship.state.shipShape = []
                     return Error('Overlaps a ship')
                 }else{
-                    state.board[y][x] = 1
+                    toPutOnCoordinates.push([y, x])
                 }
 
             }
 
+            for (let i = 0; i < toPutOnCoordinates.length; i++){
+                let y = toPutOnCoordinates[i][0];
+                let x = toPutOnCoordinates[i][1];
+                
+                state.board[y][x] = 1;
+            }
+
+            state.allShips.push(ship)
+
 
         }else if (valid == false){
+            ship.state.shipShape = []
             return Error('Ship overextends map')
         }
 
     }
 
-    // function attackOnBoard(coordinates){
-    //     //format y,x
 
-    // }
+    function receiveAttack(coordinates){
+        let y = coordinates[0];
+        let x = coordinates[1];
 
-    // function receiveAttack(coordinates){
+        let missedHit = true;
+        let notGuessed = true;
+        let guessedCoordinates = state.hitCoordinates.concat(state.missedCoordinates)
 
-    // }
+        for (let i = 0; i < guessedCoordinates.length; i++){
+            if (JSON.stringify(coordinates) == JSON.stringify(guessedCoordinates[i])){
+                notGuessed = false
+                break
+            }
+        }
+
+
+        if (notGuessed == true){
+            for (let i = 0; i < state.allShips.length; i++){
+                let ship = state.allShips[i]
+    
+    
+                for (let j = 0; j < ship.state.shipShape.length; j++){
+                    if (JSON.stringify(ship.state.shipShape[j]) == JSON.stringify(coordinates)){
+                        state.hitCoordinates.push(coordinates)
+                        missedHit = false
+                        //9 means ship tile hit
+                        state.board[y][x] = 9
+                        ship.hit()
+                        allShipsDead()
+                    }
+    
+                }
+            }
+    
+            if (missedHit == true){
+
+                //2 means empty tile hit
+                state.board[y][x] = 2
+    
+                state.missedCoordinates.push(coordinates)
+    
+            }
+        }else if (notGuessed == false){
+            return Error('Already shot there')
+        }
+        
+        
+
+    }
+
+
+    function allShipsDead(){
+
+        let totalShipsSunk = 0
+
+        for (let i = 0; i < state.allShips.length; i++){
+            let ship = state.allShips[i]
+            if (ship.state.sunk == true){
+                totalShipsSunk++
+            }
+
+        }
+
+        if (totalShipsSunk == state.allShips.length){
+            state.allDead = true
+        }
+    }
 
     return Object.assign(
-        {state, placeShip}
+        {state, placeShip, receiveAttack}
     )
 
 

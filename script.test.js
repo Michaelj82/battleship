@@ -40,7 +40,7 @@ test('Making a ship and its length go out of bounds returns Error', () => {
 })
 
 test('If you place down a ship it sets the Gameboards coordinate to 1', () =>{
-    let ship = myModule.Ship(2);
+    let ship = myModule.Ship(3);
     let board = myModule.Gameboard();
 
     board.placeShip(ship, 1,1, 'vertical')
@@ -49,7 +49,7 @@ test('If you place down a ship it sets the Gameboards coordinate to 1', () =>{
         [0,0,0,0,0,0,0],
         [0,1,0,0,0,0,0],
         [0,1,0,0,0,0,0],
-        [0,0,0,0,0,0,0],
+        [0,1,0,0,0,0,0],
         [0,0,0,0,0,0,0],
         [0,0,0,0,0,0,0],
         [0,0,0,0,0,0,0]
@@ -66,8 +66,89 @@ test('Cant overlap ships', () =>{
 
     let newShip = myModule.Ship(3)
 
-    board.placeShip
-
     expect(board.placeShip(newShip, 0, 1, 'vertical')).toMatchObject(Error('Overlaps a ship'))
 
+})
+
+test('receiveAttack hits a ship', () =>{
+    let ship = myModule.Ship(3);
+    let board = myModule.Gameboard();
+
+    board.placeShip(ship, 1,1, 'vertical')
+    board.receiveAttack([2,1])
+    board.receiveAttack([1,1])
+
+
+
+    expect(ship.state.timesHit).toBe(2)
+    expect(ship.state.sunk).toBe(false)
+
+    expect(board.state.board).toMatchObject([
+        [0,0,0,0,0,0,0],
+        [0,9,0,0,0,0,0],
+        [0,9,0,0,0,0,0],
+        [0,1,0,0,0,0,0],
+        [0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0]
+
+    ])
+})
+
+test('missing a tile is prevalent on the board', () => {
+    let ship = myModule.Ship(3);
+    let board = myModule.Gameboard();
+
+    board.placeShip(ship, 1,1, 'vertical')
+    board.receiveAttack([4,4])
+
+    expect(board.state.board).toMatchObject([
+        [0,0,0,0,0,0,0],
+        [0,1,0,0,0,0,0],
+        [0,1,0,0,0,0,0],
+        [0,1,0,0,0,0,0],
+        [0,0,0,0,2,0,0],
+        [0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0]
+
+    ])
+})
+
+test('Shooting at already shot tile is not allowed', () => {
+    let ship = myModule.Ship(3);
+    let board = myModule.Gameboard();
+
+    board.placeShip(ship, 1,1, 'vertical')
+    board.receiveAttack([1,1])
+
+    expect(board.receiveAttack([1,1])).toMatchObject(Error('Already shot there'))
+    expect(board.state.board).toMatchObject([
+        [0,0,0,0,0,0,0],
+        [0,9,0,0,0,0,0],
+        [0,1,0,0,0,0,0],
+        [0,1,0,0,0,0,0],
+        [0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0]
+
+    ])
+})
+
+
+test('Killing all ships return allDead true', () =>{
+    let ship = myModule.Ship(2);
+    let ship2 = myModule.Ship(2)
+    let board = myModule.Gameboard();
+
+    board.placeShip(ship, 1,1, 'vertical')
+    board.receiveAttack([2,1])
+    board.receiveAttack([1,1])
+
+    board.placeShip(ship2, 4,1, 'horizontal')
+    board.receiveAttack([4,1])
+    board.receiveAttack([4,2])
+
+
+
+    expect(board.state.allDead).toBe(true)
 })
