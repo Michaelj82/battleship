@@ -152,3 +152,58 @@ test('Killing all ships return allDead true', () =>{
 
     expect(board.state.allDead).toBe(true)
 })
+
+
+test('Can make multiple players and boardsand attack between them', () =>{
+    let BoardPlayer1 = myModule.Gameboard()
+    let BoardPlayer2 = myModule.Gameboard()
+
+
+    let Player1 = myModule.Player(null, BoardPlayer1)
+    let Player2 = myModule.Player(null, BoardPlayer2)
+    Player1.state.enemy = Player2
+    Player2.state.enemy = Player1
+
+
+    let Player1Ship1 = myModule.Ship(2);
+    let Player1Ship2 = myModule.Ship(2);
+
+    let Player2Ship1 = myModule.Ship(2);
+    let Player2Ship2 = myModule.Ship(2);
+
+    BoardPlayer1.placeShip(Player1Ship1, 1,1, 'vertical')
+
+    BoardPlayer1.placeShip(Player1Ship2, 4,4, 'horizontal')
+
+    BoardPlayer2.placeShip(Player2Ship1, 1,1, 'vertical')
+
+    BoardPlayer2.placeShip(Player2Ship2, 4,4, 'horizontal')
+
+
+    Player1.attackEnemy([1,1])
+    Player2.attackEnemy([1,1])
+
+    expect(Player1.state.board.state.board).toMatchObject([
+        [0,0,0,0,0,0,0],
+        [0,9,0,0,0,0,0],
+        [0,1,0,0,0,0,0],
+        [0,0,0,0,0,0,0],
+        [0,0,0,0,1,1,0],
+        [0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0]
+
+    ])
+
+    expect(Player2.state.board.state.board).toMatchObject([
+        [0,0,0,0,0,0,0],
+        [0,9,0,0,0,0,0],
+        [0,1,0,0,0,0,0],
+        [0,0,0,0,0,0,0],
+        [0,0,0,0,1,1,0],
+        [0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0]
+
+    ])
+
+
+})

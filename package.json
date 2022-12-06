@@ -2,6 +2,7 @@
   "scripts": {
     "test": "jest"
   },
+  "type": "module",
   "devDependencies": {
     "jest": "^29.3.1"
   }

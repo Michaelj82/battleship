@@ -1,5 +1,5 @@
 
-module.exports = {};
+// module.exports = {};
 
 
 //Ship fatory
@@ -10,7 +10,6 @@ const Ship = (length) => {
         timesHit: 0,
         sunk: false,
         shipShape: [],
-        board: Gameboard(),
 
     }
 
@@ -51,7 +50,7 @@ const Ship = (length) => {
 
 };
 
-module.exports.Ship = Ship
+// module.exports.Ship = Ship
 
 
 
@@ -129,50 +128,55 @@ const Gameboard = () =>{
 
 
     function receiveAttack(coordinates){
-        let y = coordinates[0];
-        let x = coordinates[1];
-
-        let missedHit = true;
-        let notGuessed = true;
-        let guessedCoordinates = state.hitCoordinates.concat(state.missedCoordinates)
-
-        for (let i = 0; i < guessedCoordinates.length; i++){
-            if (JSON.stringify(coordinates) == JSON.stringify(guessedCoordinates[i])){
-                notGuessed = false
-                break
-            }
-        }
-
-
-        if (notGuessed == true){
-            for (let i = 0; i < state.allShips.length; i++){
-                let ship = state.allShips[i]
+        if (state.allDead == false){
+            let y = coordinates[0];
+            let x = coordinates[1];
     
+            let missedHit = true;
+            let notGuessed = true;
+            let guessedCoordinates = state.hitCoordinates.concat(state.missedCoordinates)
     
-                for (let j = 0; j < ship.state.shipShape.length; j++){
-                    if (JSON.stringify(ship.state.shipShape[j]) == JSON.stringify(coordinates)){
-                        state.hitCoordinates.push(coordinates)
-                        missedHit = false
-                        //9 means ship tile hit
-                        state.board[y][x] = 9
-                        ship.hit()
-                        allShipsDead()
-                    }
-    
+            for (let i = 0; i < guessedCoordinates.length; i++){
+                if (JSON.stringify(coordinates) == JSON.stringify(guessedCoordinates[i])){
+                    notGuessed = false
+                    break
                 }
             }
     
-            if (missedHit == true){
-
-                //2 means empty tile hit
-                state.board[y][x] = 2
     
-                state.missedCoordinates.push(coordinates)
+            if (notGuessed == true){
+                for (let i = 0; i < state.allShips.length; i++){
+                    let ship = state.allShips[i]
+        
+        
+                    for (let j = 0; j < ship.state.shipShape.length; j++){
+                        if (JSON.stringify(ship.state.shipShape[j]) == JSON.stringify(coordinates)){
+                            state.hitCoordinates.push(coordinates)
+                            missedHit = false
+                            //9 means ship tile hit
+                            state.board[y][x] = 9
+                            ship.hit()
+                            allShipsDead()
+                        }
+        
+                    }
+                }
+        
+                if (missedHit == true){
     
+                    //2 means empty tile hit
+                    state.board[y][x] = 2
+        
+                    state.missedCoordinates.push(coordinates)
+        
+                }
+            }else if (notGuessed == false){
+                return Error('Already shot there')
             }
-        }else if (notGuessed == false){
-            return Error('Already shot there')
+        }else{
+            return Error('Already killed all ships')
         }
+        
         
         
 
@@ -205,4 +209,29 @@ const Gameboard = () =>{
 
 
 
-module.exports.Gameboard = Gameboard
+// module.exports.Gameboard = Gameboard
+
+
+const Player = (enemy, board) => {
+
+    let state = {
+        enemy:enemy,
+        board: board,
+
+    }
+
+    function attackEnemy(coordinates){
+
+        state.enemy.state.board.receiveAttack(coordinates)
+
+    }
+
+
+    return Object.assign(
+        {state, attackEnemy}
+    )
+
+
+}
+
+// module.exports.Player = Player
