@@ -47,15 +47,18 @@ function makeBoard(parent, sizeOfBoard){
 function playerOneSetUp(parent){
     clearDiv(parent)
     let header = document.createElement('h1');
-    header.textContent = 'BattleShisdfp!'
+    header.textContent = 'BattleShip!'
     parent.appendChild(header)
+    let header2 = document.createElement('h3');
+    header2.textContent = 'Player 1, put down your ships. Player 2, look away'
+    parent.appendChild(header2)
+
+    makeBoard(parent, 7)
 
 }
 
 
 
-
-// makeBoard(site, 7)
 
 
 
