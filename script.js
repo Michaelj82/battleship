@@ -3,7 +3,7 @@
 
 
 //Ship fatory
-const Ship = (length) => {
+export const Ship = (length) => {
 
     let state = {
         length: length,
@@ -54,7 +54,7 @@ const Ship = (length) => {
 
 
 
-const Gameboard = () =>{
+export const Gameboard = () =>{
 
     let state = {
         board: [
@@ -212,7 +212,7 @@ const Gameboard = () =>{
 // module.exports.Gameboard = Gameboard
 
 
-const Player = (enemy, board) => {
+export const Player = (enemy, board) => {
 
     let state = {
         enemy:enemy,
