@@ -29,9 +29,43 @@ body,html{
     border-color: aqua;
 }
 
+
 .ship{
-    height: 10px;
+    /* height: 10px;
     width: 10px;
-    border: solid;
+    border: solid; */
     border-color: gray;
 }
+
+.shipHit{
+    border-color: red;
+
+}
+
+.missedHit{
+    border-color: blue;
+}
+
+.shipSelection{
+    border: solid;
+    border-color: blue;
+    
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.shipSelection:hover{
+    background-color: green;
+}
+
+#allSelections{
+    border: solid;
+    border-color: red;
+
+    display: flex;
+    flex-direction: row;
+}
+
+
