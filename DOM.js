@@ -41,14 +41,11 @@ function mainPage(parent){
 mainPage(site)
 
 function refreshBoardItems(board, gameboard){
-    console.log('yo')
     let children = board.children;
     let num = 0
     for (let i =0 ; i < gameboard.state.board.length; i++){
         for (let j = 0 ; j < gameboard.state.board[i].length; j++){
-            console.log(gameboard.state.board[i][j])
             if (gameboard.state.board[i][j] == 1){
-                console.log(children)
                 children[num].classList.add('ship')
             }
 
@@ -76,7 +73,6 @@ function makeBoard(parent, gameboard){
                     SELECTION = false
                     let ship = Ship(SELECTIONNUMBER)
                     gameboard.placeShip(ship, i, j, SELECTIONTYPE)
-                    console.log(gameboard.state.board)
                     refreshBoardItems(board, gameboard)
                 }
             }
@@ -120,7 +116,7 @@ function playerOneSetUp(parent){
     allSelections.setAttribute('id', 'allSelections')
 
     let numbers = ['One', 'Two', 'Three', 'Four'];
-    for (let i = 0 ; i < 4 ; i++){
+    for (let i = 0 ; i < numbers.length ; i++){
         let ShipSelect = document.createElement('div');
         ShipSelect.classList.add('shipSelection')
         ShipSelect.textContent = numbers[i]
