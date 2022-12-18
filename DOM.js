@@ -5,10 +5,14 @@ import { Player } from './script.js'
 var Player1Board = Gameboard()
 var Player2Board = Gameboard()
 
-var Player1 = Player(NaN, Player1Board)
-var Player2 = Player(NaN, Player2Board)
+var Player1 = Player(NaN, Player1Board, 'Player One', 1)
+var Player2 = Player(NaN, Player2Board, 'Player Two', 2)
 Player1.state.enemy = Player2;
 Player2.state.enemy = Player1;
+
+var Player1Qualities = [Player1, Player1Board]
+var Player2Qualities = [Player2, Player2Board]
+
 
 
 var SELECTION = false
@@ -34,7 +38,7 @@ function mainPage(parent){
     let startGame = document.createElement('button');
     startGame.textContent = 'Click me to play!'
     startGame.onclick= function(){
-        playerOneSetUp(parent)
+        playerSetUp(parent, Player1Qualities)
     }
     parent.appendChild(startGame)
 }
@@ -129,13 +133,13 @@ function makeBoard(parent, gameboard){
 
 
 
-function playerOneSetUp(parent){
+function playerSetUp(parent, playerquals){
     clearDiv(parent)
     let header = document.createElement('h1');
     header.textContent = 'BattleShip!'
     parent.appendChild(header)
     let header2 = document.createElement('h3');
-    header2.textContent = 'Player 1, put down your ships. Player 2, look away'
+    header2.textContent = ` ${playerquals[0].state.name}, put down your ships. ${playerquals[0].state.enemy.state.name}, look away`
     parent.appendChild(header2)
 
     let allSelections = document.createElement('div');
@@ -192,8 +196,22 @@ function playerOneSetUp(parent){
 
     parent.appendChild(removeButton)
 
+    makeBoard(parent, playerquals[1])
+
+    let nextRound = document.createElement('button');
+    nextRound.textContent = 'Next Round'
+    nextRound.onclick = function(){
+        if (playerquals[0].state.playerNum == 1){
+            playerSetUp(parent, Player2Qualities)
+        }else if (playerquals[0].state.playerNum == 2){
+            console.log('TIME TO PLAY')
+        }
+    }
+    parent.appendChild(nextRound)
+
     
-    makeBoard(parent, Player1Board)
+
+
 
 }
 
