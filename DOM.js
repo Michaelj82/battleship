@@ -15,6 +15,8 @@ var SELECTION = false
 var SELECTIONNUMBER = 0
 var SELECTIONTYPE = NaN
 
+var REMOVING = false
+
 let site = document.getElementById('site')
 
 
@@ -45,7 +47,10 @@ function refreshBoardItems(board, gameboard){
     let num = 0
     for (let i =0 ; i < gameboard.state.board.length; i++){
         for (let j = 0 ; j < gameboard.state.board[i].length; j++){
-            if (gameboard.state.board[i][j] == 1){
+            if (gameboard.state.board[i][j] == 0){
+                children[num].classList.remove('ship')
+            }
+            else if (gameboard.state.board[i][j] == 1){
                 children[num].classList.add('ship')
             }
 
@@ -70,32 +75,53 @@ function makeBoard(parent, gameboard){
             tile.setAttribute('id', `tile${total}`)
             tile.onclick = function(){
                 if (SELECTION == true){
+                    REMOVING = false
                     SELECTION = false
                     let ship = Ship(SELECTIONNUMBER)
                     gameboard.placeShip(ship, i, j, SELECTIONTYPE)
+
                     refreshBoardItems(board, gameboard)
+                }
+                if (REMOVING == true){
+                    SELECTION = false
+                    REMOVING = false
+
+
+                    let coords = [i, j]
+
+                    for (let k = 0; k < gameboard.state.allShips.length ; k++){
+                        let singularShip = gameboard.state.allShips[k];
+
+                        for (let m = 0; m < singularShip.state.shipShape.length; m ++){
+                            let shipShapeValue = singularShip.state.shipShape[m]
+                            if (JSON.stringify(shipShapeValue) == JSON.stringify(coords)){
+                                let total = 0
+                                for (let l = 0 ; l < singularShip.state.shipShape.length; l++){
+                                    total++
+                                    gameboard.state.board[singularShip.state.shipShape[l][0]][singularShip.state.shipShape[l][1]] = 0
+                                }
+                                let horz = document.getElementById(`Horizontal${total}`)
+                                let vert = document.getElementById(`Vertical${total}`)
+
+                                horz.disabled = false
+                                vert.disabled = false
+
+
+                            }
+                        }
+
+
+
+
+                    }
+                    refreshBoardItems(board, gameboard)
+
                 }
             }
 
             board.appendChild(tile)
         
-            // if (SELECTION == true){
 
-
-
-
-                // for (let j = 0 ; j < SELECTIONNUMBER; j++){
-                //     if (SELECTIONTYPE == 'Horizontal'){
-                //     let selectTile = document.getElementById(`tile${i+j}`)
-                //     selectTile.classList.add('ship')
-                //     }else if (SELECTIONTYPE == 'Vertical'){
-                //         let selectTile = document.getElementById(`tile${i+(j*7)}`)
-                //         selectTile.classList.add('ship')
-                //     }
-                // }
-
-
-                // SELECTION = false
             }
 
         }
@@ -123,19 +149,28 @@ function playerOneSetUp(parent){
     
     
         let Horizontal = document.createElement('button')
+        Horizontal.setAttribute('id', `Horizontal${i+1}`)
+        let Vertical = document.createElement('button')
+        Vertical.setAttribute('id', `Vertical${i+1}`)
+
+
         Horizontal.textContent = 'Horizontal'
         Horizontal.onclick = function(){
             SELECTION = true
             SELECTIONNUMBER = (i + 1)
             SELECTIONTYPE = 'horizontal'
+            Vertical.disabled = true
+            Horizontal.disabled = true
+
         }
     
-        let Vertical = document.createElement('button')
         Vertical.textContent = 'Vertical'
         Vertical.onclick = function(){
             SELECTION = true
             SELECTIONNUMBER = (i + 1)
             SELECTIONTYPE = 'vertical'
+            Vertical.disabled = true
+            Horizontal.disabled = true
         }
     
 
@@ -147,6 +182,16 @@ function playerOneSetUp(parent){
     
     }
     parent.appendChild(allSelections)
+
+    let removeButton = document.createElement('button')
+    removeButton.textContent = 'Remove a Ship'
+    removeButton.onclick = function(){
+        REMOVING = true
+    }
+
+
+    parent.appendChild(removeButton)
+
     
     makeBoard(parent, Player1Board)
 
