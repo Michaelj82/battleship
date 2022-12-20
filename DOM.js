@@ -13,7 +13,8 @@ Player2.state.enemy = Player1;
 var Player1Qualities = [Player1, Player1Board]
 var Player2Qualities = [Player2, Player2Board]
 
-
+var TOTALSHIPTILES = 10
+var NUMBEROFSHIPS = 4
 
 var SELECTION = false
 var SELECTIONNUMBER = 0
@@ -46,22 +47,95 @@ function mainPage(parent){
 
 mainPage(site)
 
-function refreshBoardItems(board, gameboard){
-    let children = board.children;
-    let num = 0
-    for (let i =0 ; i < gameboard.state.board.length; i++){
-        for (let j = 0 ; j < gameboard.state.board[i].length; j++){
-            if (gameboard.state.board[i][j] == 0){
-                children[num].classList.remove('ship')
-            }
-            else if (gameboard.state.board[i][j] == 1){
-                children[num].classList.add('ship')
-            }
+function refreshBoardItems(board, gameboard, status){
 
+    if (status == 'selecting'){
+        let children = board.children;
 
-            num ++
+        let num = 0
+        for (let i =0 ; i < gameboard.state.board.length; i++){
+            for (let j = 0 ; j < gameboard.state.board[i].length; j++){
+                if (gameboard.state.board[i][j] == 0){
+                    children[num].classList.remove('ship')
+                }
+                else if (gameboard.state.board[i][j] == 1){
+                    children[num].classList.add('ship')
+                }
+    
+    
+                num ++
+            }
+        }
+    }else if (status == 'attacking'){
+        let children = board.children;
+
+        let num = 0
+        let hits = gameboard.state.hitCoordinates;
+        let misses = gameboard.state.missedCoordinates;
+
+        for (let i = 0 ; i < gameboard.state.board.length; i++){
+            for (let j = 0 ; j < gameboard.state.board[i].length; j++){
+                for (let k = 0; k < hits.length ; k++){
+                    if (JSON.stringify(hits[k]) == [i, j]){
+                        gameboard.state.board[i][j].classList.add('shipHit')
+                        num ++
+
+                        break
+                    }
+                }
+                for (let l = 0; l < misses.length ; l++){
+                    if (JSON.stringify(misses[l]) == [i, j]){
+                        gameboard.state.board[i][j].classList.add('missedHit')
+                        num ++
+
+                        break
+                    }
+                }
+    
+    
+            }
+        }
+    }else if (status == 'yours'){
+        let children = board.children;
+
+        let num = 0
+        let hits = gameboard.state.hitCoordinates;
+        let misses = gameboard.state.missedCoordinates;        
+        for (let i =0 ; i < gameboard.state.board.length; i++){
+            for (let j = 0 ; j < gameboard.state.board[i].length; j++){
+                if (gameboard.state.board[i][j] == 0){
+                    console.log(children[num])
+                    // children[num].classList.remove('ship')
+
+                    num ++
+                }else if (gameboard.state.board[i][j] == 1){
+                    children[num].classList.add('ship')
+                    num ++
+
+                }
+                for (let k = 0; k < hits.length ; k++){
+                    if (JSON.stringify(hits[k]) == [i, j]){
+                        gameboard.state.board[i][j].classList.remove('ship')
+                        gameboard.state.board[i][j].classList.add('shipHit')
+                        num ++
+
+                        break
+                    }
+                }
+                for (let l = 0; l < misses.length ; l++){
+                    if (JSON.stringify(misses[l]) == [i, j]){
+                        gameboard.state.board[i][j].classList.remove('ship')
+                        gameboard.state.board[i][j].classList.add('missedHit')
+                        num ++
+
+                        break
+                    }
+                }
+    
+            }
         }
     }
+    
 }
 
 
@@ -84,7 +158,7 @@ function makeBoard(parent, gameboard){
                     let ship = Ship(SELECTIONNUMBER)
                     gameboard.placeShip(ship, i, j, SELECTIONTYPE)
 
-                    refreshBoardItems(board, gameboard)
+                    refreshBoardItems(board, gameboard, 'selecting')
                 }
                 if (REMOVING == true){
                     SELECTION = false
@@ -110,6 +184,8 @@ function makeBoard(parent, gameboard){
                                 horz.disabled = false
                                 vert.disabled = false
 
+                                gameboard.state.allShips.splice(k, 1);
+
 
                             }
                         }
@@ -118,7 +194,7 @@ function makeBoard(parent, gameboard){
 
 
                     }
-                    refreshBoardItems(board, gameboard)
+                    refreshBoardItems(board, gameboard, 'selecting')
 
                 }
             }
@@ -163,8 +239,8 @@ function playerSetUp(parent, playerquals){
             SELECTION = true
             SELECTIONNUMBER = (i + 1)
             SELECTIONTYPE = 'horizontal'
-            Vertical.disabled = true
-            Horizontal.disabled = true
+            // Vertical.disabled = true
+            // Horizontal.disabled = true
 
         }
     
@@ -173,8 +249,8 @@ function playerSetUp(parent, playerquals){
             SELECTION = true
             SELECTIONNUMBER = (i + 1)
             SELECTIONTYPE = 'vertical'
-            Vertical.disabled = true
-            Horizontal.disabled = true
+            // Vertical.disabled = true
+            // Horizontal.disabled = true
         }
     
 
@@ -201,15 +277,101 @@ function playerSetUp(parent, playerquals){
     let nextRound = document.createElement('button');
     nextRound.textContent = 'Next Round'
     nextRound.onclick = function(){
-        if (playerquals[0].state.playerNum == 1){
-            playerSetUp(parent, Player2Qualities)
-        }else if (playerquals[0].state.playerNum == 2){
-            console.log('TIME TO PLAY')
+
+        let allShipsPlaced = playerquals[1].state.allShips;
+
+
+        let sum = allShipsPlaced.reduce(
+            (first, second) => first + second.state.shipShape.length,
+            0
+            )
+        
+        
+        //works but allows other combinations of 4 ships and 10 tiles,
+        //make it eventually so that it only allows 4,3,2,1, but dont focus on that now
+        if (sum == TOTALSHIPTILES && allShipsPlaced.length == NUMBEROFSHIPS){
+            if (playerquals[0].state.playerNum == 1){
+                playerSetUp(parent, Player2Qualities)
+            }else if (playerquals[0].state.playerNum == 2){
+                playerAttacking(parent, Player1Qualities)
+            }
+        }else{
+            alert('You must have a 1 tile, 2 tile, 3 tile, and 4 tile ship')
         }
+
+        
     }
     parent.appendChild(nextRound)
 
     
+
+
+
+}
+
+function makePlayingBoard(parent, gameboard, status){
+  
+    if (status == 'attacking'){
+        let board = document.createElement('div')
+        board.setAttribute('id', 'shootingboard')
+        parent.append(board)
+        let total = 0
+    
+        for (let i = 0; i < (gameboard.state.board.length); i++){
+            for(let j = 0 ; j < gameboard.state.board[i].length; j++){
+                total ++
+                let tile = document.createElement('div')
+                tile.classList.add('tile')
+                tile.setAttribute('id', `tile${total}`)
+                tile.onclick = function(){
+                    alert('bruh')
+            
+    
+                }
+                board.appendChild(tile)
+    
+            }
+        }
+    }else if(status == 'yours'){
+        let board = document.createElement('div')
+        board.setAttribute('id', 'yourboard')
+        parent.append(board)
+        let total = 0
+        for (let i = 0; i < (gameboard.state.board.length); i++){
+            for(let j = 0 ; j < gameboard.state.board[i].length; j++){
+                total ++
+                let tile = document.createElement('div')
+                tile.classList.add('tile')
+                tile.setAttribute('id', `tile${total}`)
+
+                board.appendChild(tile)
+    
+            }
+        }
+    }
+    
+}
+
+function playerAttacking(parent, playerquals){
+    clearDiv(parent)
+    let header = document.createElement('h1');
+    header.textContent = 'BattleShip!'
+    parent.appendChild(header)
+
+    let header2 = document.createElement('h3');
+    header2.textContent = ` ${playerquals[0].state.name}, choose a tile to hit. ${playerquals[0].state.enemy.state.name}, look away`
+    parent.appendChild(header2)
+
+    makePlayingBoard(parent, playerquals[0].state.enemy.state.board, 'attacking')
+    // let shootingboard = document.getElementById('shootingboard')
+    // refreshBoardItems(shootingboard, playerquals[0].state.enemy.state.board, 'attacking')
+
+    let header3 = document.createElement('h3');
+    header3.textContent = 'Your map below'
+    parent.appendChild(header3)
+
+    // makePlayingBoard(parent, playerquals[1], 'yours')
+    // let yourBoard = document.getElementById('yourboard')
 
 
 
