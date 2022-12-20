@@ -363,16 +363,16 @@ function playerAttacking(parent, playerquals){
     parent.appendChild(header2)
 
     makePlayingBoard(parent, playerquals[0].state.enemy.state.board, 'attacking')
-    // let shootingboard = document.getElementById('shootingboard')
-    // refreshBoardItems(shootingboard, playerquals[0].state.enemy.state.board, 'attacking')
+    let shootingboard = document.getElementById('shootingboard')
+    refreshBoardItems(shootingboard, playerquals[0].state.enemy.state.board, 'attacking')
 
     let header3 = document.createElement('h3');
     header3.textContent = 'Your map below'
     parent.appendChild(header3)
 
-    // makePlayingBoard(parent, playerquals[1], 'yours')
-    // let yourBoard = document.getElementById('yourboard')
-
+    makePlayingBoard(parent, playerquals[1], 'yours')
+    let yourBoard = document.getElementById('yourboard')
+    refreshBoardItems(yourBoard, playerquals[1].state.board, 'yours')
 
 
 }
