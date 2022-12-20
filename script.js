@@ -212,13 +212,14 @@ export const Gameboard = () =>{
 // module.exports.Gameboard = Gameboard
 
 
-export const Player = (enemy, board, name, playerNum) => {
+export const Player = (enemy, board, name, playerNum, qualities) => {
 
     let state = {
         enemy:enemy,
         board: board,
         name: name,
         playerNum: playerNum,
+        qualities: qualities,
 
     }
 

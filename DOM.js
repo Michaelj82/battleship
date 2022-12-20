@@ -37,6 +37,9 @@ function clearDiv(div){
 
 
 function mainPage(parent){
+
+
+
     clearDiv(parent)
     let header = document.createElement('h1');
     header.textContent = 'BattleShip!'
@@ -343,6 +346,13 @@ function makePlayingBoard(parent, gameboard, status, playerquals){
 
                         if (gameboard.state.allDead == true){
                             alert('Congrats You have Won!')
+                            let playAgain = document.createElement('button');
+                            playAgain.textContent = 'Play Again?'
+                            playAgain.onclick = function(){
+                                location.reload()
+                                mainPage(parent)
+                            }
+                            parent.appendChild(playAgain)
                         }else{
                             playerAttacking(parent, playerquals[0].state.enemy.state.qualities)
                         }
