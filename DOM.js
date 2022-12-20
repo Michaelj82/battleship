@@ -27,7 +27,10 @@ var REMOVING = false
 
 let site = document.getElementById('site')
 
+function delay (time){
+    return new Promise(resolve=> setTimeout(resolve, time));
 
+}
 function clearDiv(div){
     div.innerHTML = ''
 }
@@ -297,6 +300,19 @@ function playerSetUp(parent, playerquals){
 
 }
 
+
+function numberOfShipsSunk(gameboard){
+    let total = 0
+    for (let i = 0; i < gameboard.state.allShips.length; i++){
+        let ship = gameboard.state.allShips[i]
+        if (ship.state.sunk == true){
+            total ++ 
+        }
+
+    }
+    return total
+}
+
 function makePlayingBoard(parent, gameboard, status, playerquals){
   
     if (status == 'attacking'){
@@ -312,12 +328,18 @@ function makePlayingBoard(parent, gameboard, status, playerquals){
                 tile.classList.add('tile')
                 tile.setAttribute('id', `tile${total}`)
                 tile.onclick = function(){
+                    let shipsSunk = numberOfShipsSunk(gameboard)
                     let test = gameboard.receiveAttack([i, j])
                     if (test instanceof Error){
                         alert('You have already shot there')
                     }else{
-                        gameboard.receiveAttack([i, j])
                         refreshBoardItems(board, gameboard, 'attacking')
+
+                        let newShipsSunk = numberOfShipsSunk(gameboard)
+
+                        if (newShipsSunk > shipsSunk){
+                            alert('You have sunk a battleship!')
+                        }
 
                         if (gameboard.state.allDead == true){
                             alert('Congrats You have Won!')
@@ -352,8 +374,15 @@ function makePlayingBoard(parent, gameboard, status, playerquals){
     
 }
 
-function playerAttacking(parent, playerquals){
+async function playerAttacking(parent, playerquals){
     clearDiv(parent)
+    let passing = document.createElement('h1');
+    passing.textContent = 'Pass the device to the other player!'
+    parent.appendChild(passing)
+    await delay(2000)
+    clearDiv(parent)
+
+
     let header = document.createElement('h1');
     header.textContent = 'BattleShip!'
     parent.appendChild(header)
