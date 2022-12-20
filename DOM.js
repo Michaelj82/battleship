@@ -5,13 +5,16 @@ import { Player } from './script.js'
 var Player1Board = Gameboard()
 var Player2Board = Gameboard()
 
-var Player1 = Player(NaN, Player1Board, 'Player One', 1)
-var Player2 = Player(NaN, Player2Board, 'Player Two', 2)
+var Player1 = Player(NaN, Player1Board, 'Player One', 1, NaN)
+var Player2 = Player(NaN, Player2Board, 'Player Two', 2, NaN)
 Player1.state.enemy = Player2;
 Player2.state.enemy = Player1;
 
 var Player1Qualities = [Player1, Player1Board]
 var Player2Qualities = [Player2, Player2Board]
+Player1.state.qualities = Player1Qualities;
+Player2.state.qualities = Player2Qualities;
+
 
 var TOTALSHIPTILES = 10
 var NUMBEROFSHIPS = 4
@@ -70,26 +73,20 @@ function refreshBoardItems(board, gameboard, status){
         let children = board.children;
 
         let num = 0
-        let hits = gameboard.state.hitCoordinates;
-        let misses = gameboard.state.missedCoordinates;
+
 
         for (let i = 0 ; i < gameboard.state.board.length; i++){
             for (let j = 0 ; j < gameboard.state.board[i].length; j++){
-                for (let k = 0; k < hits.length ; k++){
-                    if (JSON.stringify(hits[k]) == [i, j]){
-                        gameboard.state.board[i][j].classList.add('shipHit')
-                        num ++
+                if (gameboard.state.board[i][j] == 9){
+                    children[num].classList.add('shipHit')
 
-                        break
-                    }
-                }
-                for (let l = 0; l < misses.length ; l++){
-                    if (JSON.stringify(misses[l]) == [i, j]){
-                        gameboard.state.board[i][j].classList.add('missedHit')
-                        num ++
+                    num ++
+                }else if (gameboard.state.board[i][j] == 2){
+                    children[num].classList.add('missedHit')
+                    num ++
 
-                        break
-                    }
+                }else{
+                    num ++
                 }
     
     
@@ -99,13 +96,11 @@ function refreshBoardItems(board, gameboard, status){
         let children = board.children;
 
         let num = 0
-        let hits = gameboard.state.hitCoordinates;
-        let misses = gameboard.state.missedCoordinates;        
+      
         for (let i =0 ; i < gameboard.state.board.length; i++){
             for (let j = 0 ; j < gameboard.state.board[i].length; j++){
                 if (gameboard.state.board[i][j] == 0){
-                    console.log(children[num])
-                    // children[num].classList.remove('ship')
+                    children[num].classList.remove('ship')
 
                     num ++
                 }else if (gameboard.state.board[i][j] == 1){
@@ -113,23 +108,16 @@ function refreshBoardItems(board, gameboard, status){
                     num ++
 
                 }
-                for (let k = 0; k < hits.length ; k++){
-                    if (JSON.stringify(hits[k]) == [i, j]){
-                        gameboard.state.board[i][j].classList.remove('ship')
-                        gameboard.state.board[i][j].classList.add('shipHit')
-                        num ++
+                else if (gameboard.state.board[i][j] == 9){
+                    children[num].classList.add('shipHit')
 
-                        break
-                    }
-                }
-                for (let l = 0; l < misses.length ; l++){
-                    if (JSON.stringify(misses[l]) == [i, j]){
-                        gameboard.state.board[i][j].classList.remove('ship')
-                        gameboard.state.board[i][j].classList.add('missedHit')
-                        num ++
+                    num ++
+                }else if (gameboard.state.board[i][j] == 2){
+                    children[num].classList.add('missedHit')
+                    num ++
 
-                        break
-                    }
+                }else{
+                    num++
                 }
     
             }
@@ -309,7 +297,7 @@ function playerSetUp(parent, playerquals){
 
 }
 
-function makePlayingBoard(parent, gameboard, status){
+function makePlayingBoard(parent, gameboard, status, playerquals){
   
     if (status == 'attacking'){
         let board = document.createElement('div')
@@ -324,8 +312,20 @@ function makePlayingBoard(parent, gameboard, status){
                 tile.classList.add('tile')
                 tile.setAttribute('id', `tile${total}`)
                 tile.onclick = function(){
-                    alert('bruh')
-            
+                    let test = gameboard.receiveAttack([i, j])
+                    if (test instanceof Error){
+                        alert('You have already shot there')
+                    }else{
+                        gameboard.receiveAttack([i, j])
+                        refreshBoardItems(board, gameboard, 'attacking')
+
+                        if (gameboard.state.allDead == true){
+                            alert('Congrats You have Won!')
+                        }else{
+                            playerAttacking(parent, playerquals[0].state.enemy.state.qualities)
+                        }
+                    }
+                    
     
                 }
                 board.appendChild(tile)
@@ -362,7 +362,7 @@ function playerAttacking(parent, playerquals){
     header2.textContent = ` ${playerquals[0].state.name}, choose a tile to hit. ${playerquals[0].state.enemy.state.name}, look away`
     parent.appendChild(header2)
 
-    makePlayingBoard(parent, playerquals[0].state.enemy.state.board, 'attacking')
+    makePlayingBoard(parent, playerquals[0].state.enemy.state.board, 'attacking', playerquals)
     let shootingboard = document.getElementById('shootingboard')
     refreshBoardItems(shootingboard, playerquals[0].state.enemy.state.board, 'attacking')
 
@@ -370,9 +370,9 @@ function playerAttacking(parent, playerquals){
     header3.textContent = 'Your map below'
     parent.appendChild(header3)
 
-    makePlayingBoard(parent, playerquals[1], 'yours')
+    makePlayingBoard(parent, playerquals[1], 'yours', playerquals)
     let yourBoard = document.getElementById('yourboard')
-    refreshBoardItems(yourBoard, playerquals[1].state.board, 'yours')
+    refreshBoardItems(yourBoard, playerquals[0].state.board, 'yours')
 
 
 }

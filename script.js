@@ -174,7 +174,7 @@ export const Gameboard = () =>{
                 return Error('Already shot there')
             }
         }else{
-            return Error('Already killed all ships')
+            return 'You have already won!'
         }
         
         
